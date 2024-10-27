@@ -13,7 +13,8 @@ import stockData from "../../assets/stock.json";
 import pincodeData from "../../assets/pincodes.json";
 import Navbar from "./layout/Navbar";
 import Icon from "react-native-vector-icons/MaterialIcons";
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from "react-native-safe-area-context";
+import Cart from "./Cart";
 
 const ProductDetail = () => {
   const route = useRoute();
@@ -133,7 +134,7 @@ const ProductDetail = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <SafeAreaView style={styles.container} edges={["top"]}>
       <Navbar />
       <ScrollView style={styles.container}>
         <View style={styles.breadcrumb}>
@@ -160,13 +161,12 @@ const ProductDetail = () => {
 
         <View style={styles.imageContainer}>
           <Image
-            source={require("../../assets/doctorIcon.png")} 
-            style={styles.cornerImage} 
+            source={require("../../assets/doctorIcon.png")}
+            style={styles.cornerImage}
           />
           <Image
             source={require("../../assets/p5.png")}
             style={styles.productImage}
-            
           />
           <TouchableOpacity style={styles.magnifyButton}>
             <Text style={styles.magnifyIcon}>
@@ -195,21 +195,21 @@ const ProductDetail = () => {
         <View style={styles.featuresContainer}>
           <View style={styles.featureItem}>
             <Image
-              source={require("../../assets/p1.png")}
+              source={require("../../assets/original.webp")}
               style={styles.featureIcon}
             />
             <Text style={styles.featureText}>101% Original</Text>
           </View>
           <View style={styles.featureItem}>
             <Image
-              source={require("../../assets/p1.png")}
-              style={styles.featureIcon}
+              source={require("../../assets/lowprice.png")}
+              style={styles.featureIcon1}
             />
             <Text style={styles.featureText}>Lowest Price</Text>
           </View>
           <View style={styles.featureItem1}>
             <Image
-              source={require("../../assets/p1.png")}
+              source={require("../../assets/free.png")}
               style={styles.featureIcon}
             />
             <Text style={styles.featureText}>Free Shipping</Text>
@@ -218,19 +218,34 @@ const ProductDetail = () => {
 
         <View style={styles.priceContainer}>
           <View style={styles.priceRow}>
-            <Text style={styles.originalPrice}>
-              ₹{product["Original Price"]}
-            </Text>
-            <Text style={styles.salePrice}>₹{product["Sale Price"]}</Text>
-            <View style={styles.saveTag}>
-              <Text style={styles.saveTagText}>SAVE 10%</Text>
+            <View style={styles.l}>
+              <View style={styles.lBaacha}>
+                <Text style={styles.originalPrice}>
+                  ₹{product["Original Price"]}
+                </Text>
+                <Text style={styles.salePrice}>₹{product["Sale Price"]}</Text>
+                <View style={styles.saveTag}>
+                  <Text style={styles.saveTagText}>SAVE 10%</Text>
+                </View>
+              </View>
+              <View style={styles.tax}>
+                <Text style={styles.taxInfo}>(incl. of all taxes)</Text>
+              </View>
+            </View>
+
+            <View style={styles.r}>
+              <View style={styles.hurryButton}>
+                <Text style={styles.hurryButtonText}>Hurry, Few Left!</Text>
+              </View>
             </View>
           </View>
-          <Text style={styles.taxInfo}>(incl. of all taxes)</Text>
         </View>
 
         <View style={styles.packContainer}>
+          <View style={styles.packText}>
           <Text style={styles.packLabel}>Pack:</Text>
+          </View>
+          
           <View style={styles.packOptions}>
             <TouchableOpacity
               style={[
@@ -263,7 +278,6 @@ const ProductDetail = () => {
               >
                 2 x 30 gm
               </Text>
-              <Text style={styles.saveMoreText}>Save More</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -286,31 +300,45 @@ const ProductDetail = () => {
             </TouchableOpacity>
           </View>
           <View style={styles.recentlyInCart}>
+          <Image
+              source={require("../../assets/graph.png")}
+              style={styles.featureIcon}
+            />
             <Text style={styles.recentlyInCartText}>
-              📈 Recently in 1575 carts
+            
+              Recently in 1575 carts
             </Text>
           </View>
         </View>
 
+        <View style={styles.offers}>
         <View style={styles.offersContainer}>
           <Text style={styles.offersTitle}>Available offers</Text>
           <View style={styles.offerItem}>
+            
+            
             <View style={styles.offerIconContainer}>
-              <Text style={styles.offerIcon}>%</Text>
+              
+              <Image
+              source={require("../../assets/checkstar.png")}
+              style={styles.OfferIcon}
+            />
+              
             </View>
+
+
             <View style={styles.offerDetails}>
               <Text style={styles.offerText}>₹10 off on prepaid orders</Text>
               <Text style={styles.offerSubtext}>Auto applied at checkout.</Text>
             </View>
-            <Text style={styles.offerCount}>3/5</Text>
+            
           </View>
         </View>
 
-        <TouchableOpacity style={styles.hurryButton}>
-          <Text style={styles.hurryButtonText}>Hurry, Few Left!</Text>
-        </TouchableOpacity>
+        </View>
 
         <View style={styles.deliveryContainer}>
+          <Text style={styles.deliveryText}> Select Delivery Location </Text>
           <View style={styles.pincodeInputContainer}>
             <TextInput
               style={styles.pincodeInput}
@@ -357,43 +385,38 @@ const ProductDetail = () => {
           )}
         </View>
 
-        <View style={styles.buttonsContainer}>
-          <TouchableOpacity style={styles.cartButton}>
-            <Text style={styles.cartButtonText}>Add to cart</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buyButton}>
-            <Text style={styles.buyButtonText}>Buy it now</Text>
-          </TouchableOpacity>
-        </View>
+        
       </ScrollView>
-      </SafeAreaView>
+      <Cart />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f5f7',
+    backgroundColor: "#f4f5f7",
   },
   breadcrumb: {
-    padding: 16,
-    
-    
+    paddingTop: 10,
+    paddingLeft: 22,
   },
   breadcrumbText: {
-    fontSize: 14,
-    color: "#666",
+    fontSize: 12,
+    color: "#A7A8AB",
   },
   productTitle: {
     fontSize: 24,
     fontWeight: "600",
-    paddingLeft:16,
+    paddingLeft: 22,
     color: "#333",
   },
   benefitsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
-    padding: 16,
+    // padding: 16,
+    paddingLeft: 12,
+    paddingBottom: 10,
     gap: 3,
   },
   benefitItem: {
@@ -418,28 +441,24 @@ const styles = StyleSheet.create({
   searchIcon: {
     color: "black",
   },
-  cornerImage:{
-    height:55,
-    width:55,
-    position:'absolute',
-    zIndex:10,
-    left:30,
-    top:20,
+  cornerImage: {
+    height: 55,
+    width: 55,
+    position: "absolute",
+    zIndex: 10,
+    left: 30,
+    top: 20,
   },
 
   imageContainer: {
     position: "relative",
-    justifyContent:"center",
-    alignItems:"center",
-    
-    
+    justifyContent: "center",
+    alignItems: "center",
   },
   productImage: {
     width: "90%",
     height: 300,
-    borderRadius:20,
-    
-
+    borderRadius: 20,
   },
   magnifyButton: {
     position: "absolute",
@@ -462,87 +481,161 @@ const styles = StyleSheet.create({
     backgroundColor: "#ddd",
   },
   activeIndicator: {
-    backgroundColor: "#9747FF",
+    backgroundColor: "#1C1C1C",
   },
   featuresContainer: {
     flexDirection: "row",
     justifyContent: "space-around",
-    height:70,
+    height: 70,
     borderWidth: 1,
     borderColor: "#C5A1EF",
-    margin: 16,
+    // margin: 16,
+    // marginBottom:"none !important",
+    margin: 0,
+    marginHorizontal: 10,
+    marginTop:10,
     borderRadius: 8,
   },
   featureItem: {
-    
     alignItems: "center",
-    borderRightWidth:1,
-    borderColor:"black",
+    borderRightWidth: 1,
+    borderColor: "black",
     // paddingRight:17,
     // padding:10,
-    flex:1,
-    justifyContent:"center",
-    borderColor:"#C5A1EF",
+    flex: 1,
+    justifyContent: "center",
+    borderColor: "#C5A1EF",
   },
-  featureItem1:{
+  featureItem1: {
     alignItems: "center",
-    flex:1,
-    justifyContent:'center',
-
+    flex: 1,
+    justifyContent: "center",
   },
   featureIcon: {
-    width: 24,
-    height: 24,
+    width: 22,
+    height: 22,
+    marginBottom: 4,
+  },
+  featureIcon1: {
+    width: 62,
+    height: 29,
     marginBottom: 4,
   },
   featureText: {
     fontSize: 12,
     color: "#666",
+    fontWeight:"bold"
   },
-  
+
   priceContainer: {
     padding: 16,
   },
   priceRow: {
     flexDirection: "row",
+    alignItems: "flex-start",
+    height: 50,
+    width: "100%",
+    // flex: 1,
+    justifyContent: "space-between",
+  },
+  l: {
+    width: "60%",
+    height: 80,
+    flexDirection: "column",
+    justifyContent: "start",
     alignItems: "center",
-    gap: 8,
+  },
+  lBaacha: {
+    flexDirection: "row",
+    
+    justifyContent: "flex-start",
+    gap: 7,
+    alignItems: "center",
+    height: "auto",
+    width: "100%",
+  },
+  tax: {
+    height: 15,
+    width: "100%",
+    justifyContent: "center",
+  },
+  r: {
+    width: "40%",
+    justifyContent: "flex-start",
+    alignItems: "flex-end",
+    height: "auto",
   },
   originalPrice: {
-    fontSize: 16,
+    fontSize: 14,
     color: "#666",
     textDecorationLine: "line-through",
   },
   salePrice: {
-    fontSize: 24,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#008001",
   },
   saveTag: {
     backgroundColor: "#9747FF",
-    paddingHorizontal: 8,
-    paddingVertical: 4,
+    // paddingHorizontal: 1,
+    // paddingVertical: 4,
+
+    justifyContent: "center",
+    alignItems: "center",
+    height: 30,
+    width: "30%",
+    // width:150,
     borderRadius: 4,
   },
   saveTagText: {
     color: "white",
     fontSize: 12,
   },
+  taxInfo: {
+    fontSize: 11,
+    fontWeight: "normal",
+    color: "#737479",
+  },
+  
   packContainer: {
     padding: 16,
+    flexDirection:"row",
+    justifyContent:"flex-start",
+    alignItems:"center",
+    
+    paddingTop:0,
   },
+
+  packText:{
+    height:50,
+    width:"15%",
+    justifyContent:"center",
+    alignItems: "flex-start",
+
+    
+  },
+
   packLabel: {
     fontSize: 16,
-    marginBottom: 8,
+    // marginBottom: 8,
+    height:40,
+    textAlignVertical: "center",
+    textAlign:"center",
+    fontWeight:"bold",
+    // backgroundColor:"purple",
   },
+
+
   packOptions: {
     flexDirection: "row",
     gap: 12,
+    
+    
   },
   packButton: {
     borderWidth: 1,
     borderColor: "#ddd",
-    borderRadius: 20,
+    borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 8,
     alignItems: "center",
@@ -552,10 +645,10 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3e5f5",
   },
   packButtonText: {
-    color: "#666",
+    color: "black",
   },
   selectedPackText: {
-    color: "#9747FF",
+    color: "black",
   },
   saveMoreText: {
     fontSize: 10,
@@ -595,63 +688,35 @@ const styles = StyleSheet.create({
   },
   recentlyInCart: {
     marginLeft: "auto",
+    flexDirection:"row",
+    gap:8,
+    justifyContent:"center",
+    alignItems:"center"
   },
   recentlyInCartText: {
-    fontSize: 12,
-    color: "#666",
+    fontSize: 13,
+    color: "#008000",
+    fontWeight:"500"
   },
-  offersContainer: {
-    margin: 16,
-    padding: 16,
-    backgroundColor: "#fff9c4",
-    borderRadius: 8,
-  },
-  offersTitle: {
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 12,
-  },
-  offerItem: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  offerIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: "#ff9800",
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 12,
-  },
-  offerIcon: {
-    color: "white",
-    fontSize: 16,
-  },
-  offerDetails: {
-    flex: 1,
-  },
-  offerText: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  offerSubtext: {
-    fontSize: 12,
-    color: "#666",
-  },
-  offerCount: {
-    fontSize: 12,
-    color: "#666",
-  },
+  
   hurryButton: {
     backgroundColor: "#ff9800",
-    margin: 16,
-    padding: 12,
-    borderRadius: 25,
+    // margin: 16,
+    // padding: 12,
+    width: "90%",
+    height: 30,
+    borderRadius: 4,
     alignItems: "center",
+    justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "black",
+    
   },
   deliveryContainer: {
     padding: 16,
+  },
+  deliveryText:{
+    marginBottom:10,
   },
   pincodeInputContainer: {
     flexDirection: "row",
@@ -686,24 +751,46 @@ const styles = StyleSheet.create({
   errorMessage: {
     color: "#f44336",
   },
+
+  offers:{
+    width:"100%",
+    justifyContent:"center",
+    alignItems:"center"
+  },
   offersContainer: {
-    marginTop: 16,
-    backgroundColor: "#fff9c4",
+    // marginTop: 16,
+    backgroundColor: "#ffefd2",
     padding: 16,
-    borderRadius: 8,
+    paddingTop:10,
+    borderRadius: 5,
+    width:"95%",
+    
   },
   offersTitle: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "600",
     marginBottom: 8,
+    color: "#474a57",
+    fontWeight: "600",
+    letterSpacing: 0.5
   },
   offerItem: {
     flexDirection: "row",
     alignItems: "center",
+    width:"100%",
+    paddingTop:10,
+    paddingBottom:10,
+    gap:10,
+    marginLeft:20,
+  },
+  OfferIcon:{
+    width: 34,
+    height: 34,
+    
   },
   offerIcon: {
-    width: 24,
-    height: 24,
+    width: 34,
+    height: 34,
     marginRight: 8,
   },
   offerDetails: {
@@ -717,42 +804,10 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666",
   },
-  buttonsContainer: {
-    flexDirection: "row",
-    padding: 16,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-  },
-  cartButton: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#9747FF",
-    borderRadius: 25,
-    padding: 12,
-    marginRight: 8,
-    alignItems: "center",
-  },
-  cartButtonText: {
-    color: "#9747FF",
-    fontSize: 16,
-    fontWeight: "500",
-  },
-  buyButton: {
-    flex: 1,
-    backgroundColor: "#9747FF",
-    borderRadius: 25,
-    padding: 12,
-    marginLeft: 8,
-    alignItems: "center",
-  },
-  buyButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "500",
-  },
+  
   hurryButtonText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 13,
     fontWeight: "500",
   },
 });
