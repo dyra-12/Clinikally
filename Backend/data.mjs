@@ -1,7 +1,6 @@
 import fs from 'fs';
 import Papa from 'papaparse';
 import moment from 'moment';
-
 // 1. Function to parse CSV file from file path
 const parseCSVFromFile = (filePath) => {
   const csvString = fs.readFileSync(filePath, 'utf-8');
