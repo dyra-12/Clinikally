@@ -27,7 +27,7 @@ const ProductDetail = () => {
     }
 
     // Find pincode information
-    const pincodeInfo = pincodeData.find(item => item.Pincode === parseInt(pincode));
+    const pincodeInfo = pincodeData.find(item => item.Pincode === pincode);
     if (!pincodeInfo) {
       setDeliveryInfo({
         available: false,
@@ -37,34 +37,54 @@ const ProductDetail = () => {
       return;
     }
 
-    // Calculate delivery date based on provider
     const currentTime = new Date();
     const currentHour = currentTime.getHours();
     let deliveryDate = new Date();
     let message = '';
 
+    // Delivery logic based on provider
     switch (pincodeInfo['Logistics Provider']) {
       case 'Provider A':
         if (currentHour < 17) { // Before 5 PM
-          message = 'Same day delivery available';
+          deliveryDate = new Date();
+          message = 'Same-day delivery available if ordered now';
         } else {
           deliveryDate.setDate(deliveryDate.getDate() + 1);
-          message = `Get it By Tomorrow, ${deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          message = `Next-day delivery by ${deliveryDate.toLocaleDateString('en-US', { 
+            weekday: 'long',
+            month: 'short', 
+            day: 'numeric' 
+          })}`;
         }
         break;
 
       case 'Provider B':
         if (currentHour < 9) { // Before 9 AM
-          message = 'Same day delivery available';
+          deliveryDate = new Date();
+          message = 'Same-day delivery available if ordered now';
         } else {
           deliveryDate.setDate(deliveryDate.getDate() + 1);
-          message = `Get it By Tomorrow, ${deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+          message = `Next-day delivery by ${deliveryDate.toLocaleDateString('en-US', { 
+            weekday: 'long',
+            month: 'short', 
+            day: 'numeric' 
+          })}`;
         }
         break;
 
       case 'General Partners':
-        deliveryDate.setDate(deliveryDate.getDate() + pincodeInfo.TAT);
-        message = `Get it By ${deliveryDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`;
+        // Using TAT from pincode data for delivery estimate
+        const tat = parseInt(pincodeInfo.TAT);
+        deliveryDate.setDate(deliveryDate.getDate() + tat);
+        message = `Estimated delivery by ${deliveryDate.toLocaleDateString('en-US', { 
+          weekday: 'long',
+          month: 'short', 
+          day: 'numeric' 
+        })} (${tat} days)`;
+        break;
+
+      default:
+        message = 'Delivery information not available';
         break;
     }
 
@@ -72,12 +92,12 @@ const ProductDetail = () => {
       available: true,
       message,
       provider: pincodeInfo['Logistics Provider'],
-      tat: pincodeInfo.TAT
+      tat: pincodeInfo.TAT,
+      deliveryDate
     });
     
     setLoading(false);
   };
-
   return (
     <>
     <Navbar/>
@@ -129,13 +149,20 @@ const ProductDetail = () => {
             maxLength={6}
           />
           <TouchableOpacity 
-            style={styles.checkButton}
+            style={[
+              styles.checkButton,
+              pincode.length !== 6 && styles.disabledButton
+            ]}
             onPress={checkDelivery}
             disabled={pincode.length !== 6}
           >
             <Text style={styles.checkButtonText}>Check</Text>
           </TouchableOpacity>
         </View>
+
+        {loading && (
+          <Text style={styles.loadingText}>Checking delivery information...</Text>
+        )}
 
         {deliveryInfo && (
           <View style={styles.deliveryInfo}>
@@ -145,6 +172,11 @@ const ProductDetail = () => {
             ]}>
               {deliveryInfo.message}
             </Text>
+            {deliveryInfo.available && (
+              <Text style={styles.providerInfo}>
+                Delivery by: {deliveryInfo.provider}
+              </Text>
+            )}
           </View>
         )}
 
