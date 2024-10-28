@@ -20,6 +20,7 @@ import Icon from "react-native-vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Cart from "./Cart";
 import CountdownTimer from './CountdownTimer';
+import FlashingButton from './ShimmerButton';
 
 const ProductDetail = () => {
   const route = useRoute();
@@ -244,16 +245,14 @@ const ProductDetail = () => {
             </View>
 
             <View style={styles.r}>
-              {!isInStock ? (
-                <View style={[styles.hurryButton, { backgroundColor: '#ff4444' }]}>
-                  <Text style={styles.hurryButtonText}>Out of Stock</Text>
-                </View>
-              ) : (
-                <View style={styles.hurryButton}>
-                  <Text style={styles.hurryButtonText}>Hurry, Few Left!</Text>
-                </View>
-              )}
-            </View>
+  {!isInStock ? (
+    <View style={[styles.hurryButton, { backgroundColor: '#ff4444' }]}>
+      <Text style={styles.hurryButtonText}>Out of Stock</Text>
+    </View>
+  ) : (
+    <FlashingButton text="Hurry, Few Left!" />
+  )}
+</View>
           </View>
         </View>
 
