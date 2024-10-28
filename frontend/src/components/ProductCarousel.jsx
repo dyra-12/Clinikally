@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     width: width,
-    height: 360,
+    height: 330,
     backgroundColor: '#f4f5f7',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -141,7 +141,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 10,
     left: 30,
-    top: 30,
+    top: 15,
   },
   imageContainer: {
     width: width,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   cara: {
     position: 'absolute',
-    bottom: 15, // Changed from 20 to 10 to move buttons lower
+    bottom: 10, // Changed from 20 to 10 to move buttons lower
     flexDirection: 'row',
     width: '100%', // Changed from 95% to 100% for better alignment
     justifyContent: 'space-between',
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   magnifyButton: {
     position: 'absolute',
     right: 30,
-    top:30, // Changed from 70 to 60 to maintain spacing with new button position
+    top:15, // Changed from 70 to 60 to maintain spacing with new button position
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 8,
