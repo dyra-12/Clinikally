@@ -10,7 +10,7 @@ import ProductList from './src/components/ProductList';
 import Navbar from './src/components/layout/Navbar';
 import Bottom from './src/components/Bottom';
 import ProductDetail from './src/components/ProductDetail';
-
+// import { DeliveryProvider } from './components/Bottom';
 const Stack = createNativeStackNavigator();
 
 // Define screen components with navigation prop
@@ -53,6 +53,7 @@ const MainLayout = ({ children, navigation, route }) => {
 
 export default function App() {
   return (
+    
     <SafeAreaProvider>
       <CartProvider>
         <NavigationContainer>

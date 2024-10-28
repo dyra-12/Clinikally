@@ -382,10 +382,8 @@ const ProductDetail = () => {
           </ScrollView>
         </TouchableWithoutFeedback>
         {isInStock && (
-        <>
-        <Cart />
-        </>
-      )}
+  <Cart deliveryInfo={deliveryInfo} />
+)}
       </KeyboardAvoidingView>
 
       
