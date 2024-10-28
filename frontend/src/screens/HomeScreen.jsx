@@ -86,8 +86,6 @@ const HomeScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <Navbar />
       <ScrollView>
         <Animated.View style={{ opacity: fadeAnim }}>
           <Carousel navigation={navigation} />
@@ -148,8 +146,6 @@ const HomeScreen = () => {
           />
         </Animated.View>
       </ScrollView>
-      <Bottom />
-    </SafeAreaView>
   );
 };
 
@@ -158,14 +154,12 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#fff",
   },
-  
   section: {
     padding: 16,
   },
-  section2:{
+  section2: {
     padding: 16,
-    backgroundColor:"rgba(244, 245, 247,1)",
-
+    backgroundColor: "rgba(244, 245, 247,1)",
   },
   sectionTitle: {
     fontSize: 16,
@@ -179,7 +173,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "rgba(0,0,0,0.2)",
     overflow: "hidden",
-    // backgroundColor: '#f5f5f5',
   },
   serviceImage: {
     width: "100%",
@@ -208,28 +201,11 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 200,
     shadowColor: '#000',
-    // backgroundColor:"blue",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
     elevation: 5,
-  },
-  bottomNav: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    padding: 12,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    backgroundColor: "white",
-  },
-  navItem: {
-    alignItems: "center",
-  },
-  navText: {
-    fontSize: 10,
-    marginTop: 4,
-    color: "#666",
-  },
+  }
 });
 
 export default HomeScreen;

@@ -3,8 +3,9 @@ import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndi
 import products from '../../assets/products.json';
 import stockData from '../../assets/stock.json';
 import { useNavigation } from "@react-navigation/native";
-
+import { useCart } from './layout/CartContext';
 const ProductList = () => {
+  const { addToCart, removeFromCart, isInCart } = useCart();
   const [loading, setLoading] = useState(true);
   const [hasMore, setHasMore] = useState(true);
   const [displayedProducts, setDisplayedProducts] = useState([]);
@@ -49,11 +50,6 @@ const ProductList = () => {
 
   const renderHeader = () => (
     <View style={styles.headerContainer}>
-      <View style={styles.headerSection}>
-        <Text style={styles.headerTitle}>
-          Showing {displayedProducts.length} of {products.length} items
-        </Text>
-      </View>
       <View style={styles.img}>
         <Image
           source={require('../../assets/p1.png')}
@@ -61,56 +57,84 @@ const ProductList = () => {
           style={styles.img2}
         />
       </View>
+      <View style={[styles.headerSection, styles.headerSpacing]}>
+        <Text style={styles.headerTitle}>
+          Showing {displayedProducts.length} of {products.length} items
+        </Text>
+      </View>
+      
     </View>
   );
-
   const handleEndReached = () => {
     loadMoreProducts();
   };
 
-  const renderItem = ({ item, index }) => (
-    <TouchableOpacity
-      style={styles.productCard}
-      onPress={() => navigation.navigate('ProductDetail', { product: item })}
-    >
-      <View style={styles.imageContainer}>
-        <Image
-          source={require('../../assets/p5.png')}
-          defaultSource={require('../../assets/p5.png')}
-          style={styles.productImage}
-        />
-        <View style={styles.saveTag}>
-          <Text style={styles.saveText}>SAVE 15%</Text>
-        </View>
-      </View>
-      <View style={styles.productInfo}>
-        <Text style={styles.productName} numberOfLines={2}>
-          {item['Product Name']}
-        </Text>
-        <View style={styles.priceContainer}>
-          <Text style={styles.price}>₹{item.Price}</Text>
-          <Text style={styles.originalPrice}>
-            ₹{(parseFloat(item.Price) * 1.2).toFixed(2)}
-          </Text>
-        </View>
-        <TouchableOpacity 
-          style={[
-            styles.addToCartButton,
-            !item.isInStock && styles.outOfStockButton
-          ]}
-          disabled={!item.isInStock}
-        >
-          <Text style={[
-            styles.addToCartText,
-            !item.isInStock && styles.outOfStockText
-          ]}>
-            {item.isInStock ? 'Add To Cart' : 'Out of Stock'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </TouchableOpacity>
-  );
+  const renderItem = ({ item, index }) => {
+    const productInCart = isInCart(item['Product ID']);
+    
+    const handleCartAction = () => {
+      if (productInCart) {
+        removeFromCart(item['Product ID']);
+      } else {
+        addToCart(item);
+      }
+    };
 
+    return (
+      <TouchableOpacity
+        style={styles.productCard}
+        onPress={() => navigation.navigate('ProductDetail', { product: item })}
+      >
+        <View style={styles.imageContainer}>
+          <Image
+            source={require('../../assets/p5.png')}
+            defaultSource={require('../../assets/p5.png')}
+            style={styles.productImage}
+          />
+          <View style={styles.saveTag}>
+            <Text style={styles.saveText}>SAVE 15%</Text>
+          </View>
+        </View>
+        <View style={styles.productInfo}>
+          <Text style={styles.productName} numberOfLines={2}>
+            {item['Product Name']}
+          </Text>
+          <View style={styles.priceContainer}>
+            <Text style={styles.price}>₹{item.Price}</Text>
+            <Text style={styles.originalPrice}>
+              ₹{(parseFloat(item.Price) * 1.2).toFixed(2)}
+            </Text>
+          </View>
+          {item.isInStock && (
+            <TouchableOpacity 
+              style={[
+                styles.addToCartButton,
+                productInCart && styles.removeFromCartButton
+              ]}
+              onPress={handleCartAction}
+            >
+              <Text style={[
+                styles.addToCartText,
+                productInCart && styles.removeFromCartText
+              ]}>
+                {productInCart ? 'Remove from Cart' : 'Add to Cart'}
+              </Text>
+            </TouchableOpacity>
+          )}
+          {!item.isInStock && (
+            <TouchableOpacity 
+              style={[styles.addToCartButton, styles.outOfStockButton]}
+              disabled={true}
+            >
+              <Text style={[styles.addToCartText, styles.outOfStockText]}>
+                Out of Stock
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
   const renderFooter = () => {
     if (!loading && !hasMore) {
       return (
@@ -152,6 +176,7 @@ const ProductList = () => {
         ListHeaderComponent={renderHeader}
         ListFooterComponent={renderFooter}
         ListFooterComponentStyle={styles.footerComponentStyle}
+        showsVerticalScrollIndicator={false}
       />
     </View>
   );
@@ -160,17 +185,33 @@ const ProductList = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f4f5f7',
+    // backgroundColor: 'yellow',
   },
   headerContainer: {
-    paddingHorizontal: 4,
-    paddingTop: 16,
     width: '100%',
+    height: 140,
+    // flexDirection:"row",
+    // backgroundColor:"blue",
+    flexDirection:"column",
+    justifyContent:"flex-start",
+    alignContent:"flex-start",
+    padding: 0,  // Remove padding
+    margin: 0,   // Remove margin
   },
   headerSection: {
-    borderBottomWidth: 1,
+    // borderBottomWidth: 1,
+    // backgroundColor:"pink",
     borderBottomColor: '#eee',
     width: '100%',
+    height:20,
+    // backgroundColor:"pink",
+    width: '100%',
+    alignItems:"flex-end",
+    justifyContent:"center",
+  },
+  headerSpacing: {
+    paddingHorizontal: 8, // Add minimal padding for text
+    // paddingVertical: 4,   // Add minimal padding for text
   },
   headerTitle: {
     fontSize: 14,
@@ -178,20 +219,26 @@ const styles = StyleSheet.create({
   },
   productsGrid: {
     paddingBottom: 30,
+    padding: 0,    // Remove padding
+    margin: 0,     // Remove margin
   },
   img: {
-    height: 100,
     width: '100%',
+    justifyContent:"flex-start",
+    alignItems:"flex-start",
+    height: 120, // Adjust the height as needed
+    overflow: 'hidden',  // Ensures the image stays within bounds
   },
   img2: {
-    height: 100,
     width: '100%',
+    height: '100%',
+    resizeMode: 'contain',  // or use 'cover' based on your preference
   },
   productCard: {
     flex: 1,
     margin: 8,
     backgroundColor: '#fff',
-    marginTop: 20,
+    // marginTop: 20,
     shadowRadius: 4,
     borderWidth: 1,
     borderColor: '#eee',
@@ -243,6 +290,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#666',
     textDecorationLine: 'line-through',
+  },
+  removeFromCartButton: {
+    backgroundColor: '#9747FF',
+    borderColor: '#9747FF',
+  },
+  removeFromCartText: {
+    color: '#FFF',
   },
   addToCartButton: {
     backgroundColor: '#FFF',

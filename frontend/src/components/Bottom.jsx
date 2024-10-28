@@ -8,88 +8,62 @@ import {
 import React from 'react';
 import { MaterialIcons } from "@expo/vector-icons";
 import Feather from "react-native-vector-icons/Feather";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 
-const Bottom = () => {
+const Bottom = ({ currentRoute }) => {
   const navigation = useNavigation();
-  const route = useRoute();
+
+  // Debug log to verify current route
+  console.log('Current route in Bottom:', currentRoute);
+
+  const navigationItems = [
+    { name: "Home", icon: (color) => <MaterialIcons name="home" size={24} color={color} /> },
+    { name: "Shop", icon: (color) => <Feather name="shopping-bag" size={24} color={color} /> },
+    { name: "Offers", icon: (color) => <MaterialIcons name="local-offer" size={24} color={color} /> },
+    { name: "Quiz", icon: (color) => <MaterialIcons name="quiz" size={24} color={color} /> },
+    { 
+      name: "Whatsapp", 
+      icon: (color) => <FontAwesome name="whatsapp" size={24} color={color} />,
+      specialColor: "#25D366"
+    },
+  ];
 
   const isActiveRoute = (routeName) => {
-    return route.name === routeName;
+    const isActive = currentRoute === routeName;
+    console.log(`Checking ${routeName} against ${currentRoute}: ${isActive}`);
+    return isActive;
   };
 
-  const getIconColor = (routeName) => {
-    return isActiveRoute(routeName) ? "#9747FF" : "#666";
+  const getIconColor = (routeName, specialColor) => {
+    return isActiveRoute(routeName) ? "#9747FF" : (specialColor || "#666");
   };
 
   const getTextStyle = (routeName) => ({
     ...styles.navText,
     color: isActiveRoute(routeName) ? "#9747FF" : "#666",
+    fontWeight: isActiveRoute(routeName) ? "600" : "500",
   });
-  
 
   return (
     <View style={styles.bottomNav}>
+      {navigationItems.map((item) => (
         <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Home")}
-          
+          key={item.name}
+          style={[
+            styles.navItem,
+            isActiveRoute(item.name) && styles.activeNavItem
+          ]}
+          onPress={() => {
+            console.log(`Navigating to ${item.name}`);
+            navigation.navigate(item.name);
+          }}
         >
-          <MaterialIcons 
-            name="home" 
-            size={24} 
-            color={getIconColor("DoctorConsult")} 
-          />
-          <Text style={getTextStyle("Home")}>Home</Text>
+          {item.icon(getIconColor(item.name, item.specialColor))}
+          <Text style={getTextStyle(item.name)}>
+            {item.name === "Shop" ? "Products" : item.name}
+          </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Shop")}
-        >
-          <Feather 
-            name="shopping-bag" 
-            size={24} 
-            color={getIconColor("Shop")} 
-          />
-          <Text style={getTextStyle("Shop")}>Products</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Offers")}
-        >
-          <MaterialIcons 
-            name="local-offer" 
-            size={24} 
-            color={getIconColor("Offers")} 
-          />
-          <Text style={getTextStyle("Offers")}>Offers</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Quiz")}
-        >
-          <MaterialIcons 
-            name="quiz" 
-            size={24} 
-            color={getIconColor("Quiz")} 
-          />
-          <Text style={getTextStyle("Quiz")}>Quiz</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.navItem}
-          onPress={() => navigation.navigate("Whatsapp")}
-        >
-          <FontAwesome 
-            name="whatsapp" 
-            size={24} 
-            color={isActiveRoute("Whatsapp") ? "#9747FF" : "#25D366"} 
-          />
-          <Text style={getTextStyle("Whatsapp")}>Whatsapp</Text>
-        </TouchableOpacity>
+      ))}
     </View>
   );
 };
@@ -99,30 +73,32 @@ const styles = StyleSheet.create({
     position: 'fixed',
     bottom: 0,
     flexDirection: "row",
-    width:"100%",
-    // position:fixed,
+    width: "100%",
     justifyContent: "space-around",
     padding: 12,
     borderTopWidth: 1,
     borderTopColor: "#eee",
     backgroundColor: "white",
-    elevation: 8, // Android shadow
-    shadowColor: "#000", // iOS shadow
+    elevation: 8,
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: -2,
     },
     shadowOpacity: 0.1,
     shadowRadius: 2,
+    zIndex: 1000,
   },
   navItem: {
     alignItems: "center",
     paddingVertical: 4,
   },
+  activeNavItem: {
+    transform: [{scale: 1.05}],
+  },
   navText: {
     fontSize: 10,
     marginTop: 4,
-    fontWeight: "500",
   },
 });
 

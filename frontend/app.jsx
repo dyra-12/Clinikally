@@ -1,63 +1,128 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { CartProvider } from './src/components/layout/CartContext';
 import HomeScreen from './src/screens/HomeScreen';
 import ProductList from './src/components/ProductList';
 import Navbar from './src/components/layout/Navbar';
 import Bottom from './src/components/Bottom';
 import ProductDetail from './src/components/ProductDetail';
-import {
-  _View,
-} from "react-native";
-const DoctorConsultScreen = () => null;  
-const OffersScreen = () => null;         
-const QuizScreen = () => null;           
-const WhatsappScreen = () => null;       
-const ProfileScreen = () => null;       
-const CartScreen = () => null;           
 
-// Create ShopScreen component that includes the ProductList
-const ShopScreen = () => {
+const Stack = createNativeStackNavigator();
+
+// Define screen components with navigation prop
+const DoctorConsultScreen = ({ navigation }) => null;
+const OffersScreen = ({ navigation }) => null;
+const QuizScreen = ({ navigation }) => null;
+const WhatsappScreen = ({ navigation }) => null;
+const ProfileScreen = ({ navigation }) => null;
+const CartScreen = ({ navigation }) => null;
+
+const ShopScreen = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
-      <Navbar />
-      
-      <ProductList />
-      <Bottom />
+    <ProductList navigation={navigation} />
+  );
+};
+
+// Create a main layout component that includes Navbar and Bottom
+const MainLayout = ({ children, navigation, route }) => {
+  const [currentRoute, setCurrentRoute] = useState('Home');
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener('state', (e) => {
+      // Get the current route from the navigation state
+      const currentNav = e.data.state?.routes[e.data.state?.index];
+      const nestedNav = currentNav?.state?.routes[currentNav?.state?.index];
+      setCurrentRoute(nestedNav?.name || currentNav?.name || 'Home');
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <Navbar navigation={navigation} />
+      {children}
+      <Bottom currentRoute={currentRoute} />
     </SafeAreaView>
   );
 };
 
-const Stack = createNativeStackNavigator();
-
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
-        <StatusBar style="dark" />
-        <Stack.Navigator
-          initialRouteName="Home"
-          screenOptions={{
-            headerShown: false, 
-            contentStyle: { backgroundColor: 'white' },
-          }}
-        >
-          <Stack.Screen name="Home" component={HomeScreen} />
-          <Stack.Screen name="DoctorConsult" component={DoctorConsultScreen} />
-          <Stack.Screen name="Shop" component={ShopScreen} />
-          <Stack.Screen name="Offers" component={OffersScreen} />
-          <Stack.Screen name="Quiz" component={QuizScreen} />
-          <Stack.Screen name="Whatsapp" component={WhatsappScreen} />
-          <Stack.Screen name="Profile" component={ProfileScreen} />
-          <Stack.Screen name="Cart" component={CartScreen} />
-          <Stack.Screen name="ProductList" component={ProductList} />
-          <Stack.Screen name="ProductDetail" component={ProductDetail} />
-        </Stack.Navigator>
-      </NavigationContainer>
+      <CartProvider>
+        <NavigationContainer>
+          <StatusBar style="auto" />
+          <Stack.Navigator
+            screenOptions={{
+              headerShown: false,
+            }}
+          >
+            <Stack.Screen name="MainScreen">
+              {(props) => (
+                <MainLayout {...props}>
+                  <Stack.Navigator
+                    screenOptions={{
+                      headerShown: false,
+                    }}
+                    initialRouteName="Home"
+                  >
+                    <Stack.Screen 
+                      name="Home" 
+                      component={HomeScreen}
+                      options={{ title: 'Home' }}
+                    />
+                    <Stack.Screen 
+                      name="Shop" 
+                      component={ShopScreen}
+                      options={{ title: 'Shop' }}
+                    />
+                    <Stack.Screen 
+                      name="ProductDetail" 
+                      component={ProductDetail}
+                      options={{ title: 'Product Detail' }}
+                    />
+                    <Stack.Screen 
+                      name="DoctorConsult" 
+                      component={DoctorConsultScreen}
+                      options={{ title: 'Doctor Consult' }}
+                    />
+                    <Stack.Screen 
+                      name="Offers" 
+                      component={OffersScreen}
+                      options={{ title: 'Offers' }}
+                    />
+                    <Stack.Screen 
+                      name="Quiz" 
+                      component={QuizScreen}
+                      options={{ title: 'Quiz' }}
+                    />
+                    <Stack.Screen 
+                      name="Whatsapp" 
+                      component={WhatsappScreen}
+                      options={{ title: 'Whatsapp' }}
+                    />
+                    <Stack.Screen 
+                      name="Profile" 
+                      component={ProfileScreen}
+                      options={{ title: 'Profile' }}
+                    />
+                    <Stack.Screen 
+                      name="Cart" 
+                      component={CartScreen}
+                      options={{ title: 'Cart' }}
+                    />
+                  </Stack.Navigator>
+                </MainLayout>
+              )}
+            </Stack.Screen>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </CartProvider>
     </SafeAreaProvider>
   );
 }
@@ -67,5 +132,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#fff',
   },
-  
+  contentContainer: {
+    flex: 1,
+  },
 });

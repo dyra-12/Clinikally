@@ -143,8 +143,6 @@ const ProductDetail = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container} edges={["top"]}>
-      <Navbar />
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardAvoidingContainer}
@@ -384,15 +382,15 @@ const ProductDetail = () => {
        <View style={styles.keyboardSpacing} />
           </ScrollView>
         </TouchableWithoutFeedback>
-      </KeyboardAvoidingView>
-
-      {isInStock && (
+        {isInStock && (
         <>
         <Cart />
         </>
       )}
+      </KeyboardAvoidingView>
+
       
-    </SafeAreaView>
+      
   );
 };
 

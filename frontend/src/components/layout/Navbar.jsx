@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import AntDesign from "react-native-vector-icons/AntDesign";
+import { useCart } from './CartContext';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
@@ -46,6 +47,7 @@ const Navbar = ({ navigation }) => {
   const cartBadgeScale = useRef(new Animated.Value(0)).current;
   const logoOpacity = useRef(new Animated.Value(0)).current;
   const menuSlide = useRef(new Animated.Value(-50)).current;
+  const { getCartQuantity } = useCart(); // Moved here from NavButton
   
   useEffect(() => {
     // Animate navbar elements on mount
@@ -118,7 +120,7 @@ const Navbar = ({ navigation }) => {
               }
             ]}
           >
-            <Text style={styles.cartBadgeText}>0</Text>
+            <Text style={styles.cartBadgeText}>{getCartQuantity()}</Text>
           </Animated.View>
         </NavButton>
       </View>
