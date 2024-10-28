@@ -10,7 +10,7 @@ import ProductList from './src/components/ProductList';
 import Navbar from './src/components/layout/Navbar';
 import Bottom from './src/components/Bottom';
 import ProductDetail from './src/components/ProductDetail';
-// import { DeliveryProvider } from './components/Bottom';
+
 const Stack = createNativeStackNavigator();
 
 // Define screen components with navigation prop
@@ -30,17 +30,28 @@ const ShopScreen = ({ navigation }) => {
 // Create a main layout component that includes Navbar and Bottom
 const MainLayout = ({ children, navigation, route }) => {
   const [currentRoute, setCurrentRoute] = useState('Home');
+  const [previousRoute, setPreviousRoute] = useState('Home');
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('state', (e) => {
       // Get the current route from the navigation state
       const currentNav = e.data.state?.routes[e.data.state?.index];
       const nestedNav = currentNav?.state?.routes[currentNav?.state?.index];
-      setCurrentRoute(nestedNav?.name || currentNav?.name || 'Home');
+      const newRoute = nestedNav?.name || currentNav?.name || 'Home';
+      
+      // If navigating to ProductDetail, maintain the previous main route
+      if (newRoute === 'ProductDetail') {
+        setPreviousRoute(currentRoute);
+      } else {
+        setPreviousRoute(newRoute);
+      }
+      
+      // Set current route to either the new route or maintain previous route for ProductDetail
+      setCurrentRoute(newRoute === 'ProductDetail' ? previousRoute : newRoute);
     });
 
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, previousRoute, currentRoute]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -53,7 +64,6 @@ const MainLayout = ({ children, navigation, route }) => {
 
 export default function App() {
   return (
-    
     <SafeAreaProvider>
       <CartProvider>
         <NavigationContainer>
