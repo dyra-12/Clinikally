@@ -19,7 +19,7 @@ import Navbar from "./layout/Navbar";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Cart from "./Cart";
-import CountdownTimer from "./CountdownTimer";
+import CountdownTimer from './CountdownTimer';
 
 const ProductDetail = () => {
   const route = useRoute();
@@ -333,9 +333,7 @@ const ProductDetail = () => {
             
 
             {/* <CountdownTimer provider={deliveryInfo.provider}/> */}
-            {showTimer && deliveryInfo?.available && (
-          <CountdownTimer provider={deliveryInfo.provider} />
-        )}
+            
 
             <View style={styles.deliveryContainer}>
         <Text style={styles.deliveryText}>Select Delivery Location</Text>
@@ -356,12 +354,18 @@ const ProductDetail = () => {
             <Text style={styles.checkButtonText}>Check</Text>
           </TouchableOpacity>
         </View>
+        {showTimer && deliveryInfo?.available && (
+  <CountdownTimer 
+    provider={deliveryInfo.provider} 
+    tat={parseInt(deliveryInfo.tat)}  // Pass TAT directly for all providers
+  />
+)}
 
         {loading && (
           <Text style={styles.loadingText}>Checking delivery information...</Text>
         )}
 
-        {deliveryInfo && (
+        {/* {deliveryInfo && (
           <View style={styles.deliveryInfo}>
             <Text style={[styles.deliveryMessage, !deliveryInfo.available && styles.errorMessage]}>
               {deliveryInfo.message}
@@ -370,7 +374,7 @@ const ProductDetail = () => {
               <Text style={styles.providerInfo}>Delivery by: {deliveryInfo.provider}</Text>
             )}
           </View>
-        )}
+        )} */}
 
         
       </View>

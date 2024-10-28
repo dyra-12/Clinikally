@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, ActivityIndicator } from 'react-native';
 import products from '../../assets/products.json';
-import { useRoute } from '@react-navigation/native';
-// import ProductList from './src/components/ProductList';
+import stockData from '../../assets/stock.json';
 import { useNavigation } from "@react-navigation/native";
 
 const ProductList = () => {
@@ -25,22 +24,27 @@ const ProductList = () => {
     
     const startIndex = currentPage * ITEMS_PER_PAGE;
     const endIndex = startIndex + ITEMS_PER_PAGE;
-    const newProducts = products.slice(startIndex, endIndex).map((product, index) => ({
-      ...product,
-      uniqueId: `${startIndex + index}-${product['Product ID']}`
-    }));
-
+    const newProducts = products.slice(startIndex, endIndex).map((product, index) => {
+      // Check stock status for each product
+      const stockInfo = stockData.find(item => item["Product ID"] === product["Product ID"]);
+      const isInStock = stockInfo?.["Stock Available"] !== "False";
+      
+      return {
+        ...product,
+        isInStock,
+        uniqueId: `${startIndex + index}-${product['Product ID']}`
+      };
+    });
 
     if (endIndex >= products.length) {
       setHasMore(false);
     }
 
-    // Simulate network delay for demonstration
     setTimeout(() => {
       setDisplayedProducts(prev => [...prev, ...newProducts]);
       setCurrentPage(prev => prev + 1);
       setLoading(false);
-    }, 1000); // Add a slight delay to make the loading more visible
+    }, 1000);
   };
 
   const renderHeader = () => (
@@ -89,8 +93,19 @@ const ProductList = () => {
             ₹{(parseFloat(item.Price) * 1.2).toFixed(2)}
           </Text>
         </View>
-        <TouchableOpacity style={styles.addToCartButton}>
-          <Text style={styles.addToCartText}>Add To Cart</Text>
+        <TouchableOpacity 
+          style={[
+            styles.addToCartButton,
+            !item.isInStock && styles.outOfStockButton
+          ]}
+          disabled={!item.isInStock}
+        >
+          <Text style={[
+            styles.addToCartText,
+            !item.isInStock && styles.outOfStockText
+          ]}>
+            {item.isInStock ? 'Add To Cart' : 'Out of Stock'}
+          </Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
@@ -142,7 +157,6 @@ const ProductList = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -152,7 +166,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
     paddingTop: 16,
     width: '100%',
-    
   },
   headerSection: {
     borderBottomWidth: 1,
@@ -164,8 +177,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   productsGrid: {
-    // padding: 8,
-    paddingBottom: 30, // Add padding at the bottom to ensure the footer is visible
+    paddingBottom: 30,
   },
   img: {
     height: 100,
@@ -179,15 +191,10 @@ const styles = StyleSheet.create({
     flex: 1,
     margin: 8,
     backgroundColor: '#fff',
-    // shadowColor: '#000',
-    // shadowOffset: { width: 0, height: 2 },
     marginTop: 20,
-    // shadowOpacity: 0.1,
     shadowRadius: 4,
-    // elevation: 3,
     borderWidth: 1,
     borderColor: '#eee',
-    
   },
   imageContainer: {
     position: 'relative',
@@ -245,12 +252,18 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
   },
+  outOfStockButton: {
+    backgroundColor: '#ff4444',
+    borderColor: '#ff4444',
+  },
   addToCartText: {
     color: '#9747FF',
     fontSize: 12,
     fontWeight: '500',
   },
-  // Updated loader styles
+  outOfStockText: {
+    color: '#FFF',
+  },
   initialLoaderContainer: {
     flex: 1,
     alignItems: 'center',
@@ -263,7 +276,7 @@ const styles = StyleSheet.create({
   },
   footerComponentStyle: {
     marginVertical: 10,
-    marginBottom: 10, // Add extra margin at the bottom
+    marginBottom: 10,
   },
   endMessageContainer: {
     paddingVertical: 10,

@@ -1,142 +1,165 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { Clock } from 'lucide-react-native';
 
-const CountdownTimer = ({ provider, style }) => {
-  const [timeRemaining, setTimeRemaining] = useState('');
-  const [isExpired, setIsExpired] = useState(false);
+const CountdownTimer = ({ provider, tat }) => {
+  const [timeLeft, setTimeLeft] = useState({
+    hours: 0,
+    minutes: 0
+  });
+  const [deliveryInfo, setDeliveryInfo] = useState({
+    day: '',
+    date: ''
+  });
+  const [isSameDay, setIsSameDay] = useState(false);
 
   useEffect(() => {
-    const calculateTime = () => {
+    const calculateDeliveryTime = () => {
+      const now = new Date();
+      let cutoffTime = new Date();
+      let deliveryDate = new Date();
+      let sameDayPossible = false;
+      let useTatDelivery = false;
 
-     
-      const currentTime = new Date();
-      //  currentTime.setHours(8, 0, 0, 0);
-      const cutoffTime = new Date();
-      
+      if (provider === "Provider A") {
+        cutoffTime.setHours(17, 0, 0); // 5 PM cutoff
+        if (now > cutoffTime) {
+          // If past cutoff, use TAT from JSON
+          useTatDelivery = true;
+          deliveryDate.setDate(deliveryDate.getDate() + tat);
+        } else {
+          sameDayPossible = true;
+        }
+      } else if (provider === "General Partners") {
+        useTatDelivery = true;
+        deliveryDate.setDate(deliveryDate.getDate() + tat);
+      } else if (provider === 'Provider B') {
+        cutoffTime.setHours(9, 0, 0); // 9 AM cutoff
+        if (now > cutoffTime) {
+          deliveryDate.setDate(deliveryDate.getDate() + 1);
+        } else {
+          sameDayPossible = true;
+        }
+      }
 
-      // Set cutoffHour based on the provider
-      const cutoffHour = provider === 'Provider A' ? 17 : 9; // 5 PM for Provider A, 9 AM for Provider B
-      cutoffTime.setHours(cutoffHour, 0, 0, 0);
+      // Skip weekends for TAT-based delivery
+      if (useTatDelivery) {
+        while (deliveryDate.getDay() === 0) { // Skip Sundays
+          deliveryDate.setDate(deliveryDate.getDate() + 1);
+        }
+        sameDayPossible = false;
+      }
 
-      const timeDifference = cutoffTime - currentTime;
+      setIsSameDay(sameDayPossible);
 
-      // Check if cutoff time is in the future for today
-      if (timeDifference > 0) {
-        const hours = Math.floor(timeDifference / (1000 * 60 * 60));
-        const minutes = Math.floor((timeDifference % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((timeDifference % (1000 * 60)) / 1000);
+      // Calculate time remaining until cutoff only for same day delivery
+      if (sameDayPossible) {
+        const timeDiff = cutoffTime - now;
+        if (timeDiff > 0) {
+          const hours = Math.floor(timeDiff / (1000 * 60 * 60));
+          const minutes = Math.floor((timeDiff % (1000 * 60 * 60)) / (1000 * 60));
+          setTimeLeft({ hours, minutes });
+        }
+      }
 
-        setTimeRemaining(`${hours}h ${minutes}m ${seconds}s`);
-        setIsExpired(false);
+      // Format the delivery date
+      const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+      const formattedDate = `${deliveryDate.getDate()} ${months[deliveryDate.getMonth()]}`;
+
+      // Calculate if it's next day delivery
+      const isNextDay = deliveryDate.getDate() - now.getDate() === 1 ||
+        (now.getDate() === lastDayOfMonth(now) && deliveryDate.getDate() === 1);
+
+      // Set delivery info based on calculated date
+      if (sameDayPossible) {
+        setDeliveryInfo({
+          day: 'Today',
+          date: formattedDate
+        });
+      } else if (isNextDay && deliveryDate.getDay() !== 0 && !useTatDelivery) {
+        setDeliveryInfo({
+          day: 'Tomorrow',
+          date: formattedDate
+        });
       } else {
-        setTimeRemaining('');
-        setIsExpired(true);
+        setDeliveryInfo({
+          day: days[deliveryDate.getDay()],
+          date: formattedDate
+        });
       }
     };
 
-    calculateTime(); // Initial calculation
-    const interval = setInterval(calculateTime, 1000);
+    // Helper function to get last day of month
+    const lastDayOfMonth = (date) => {
+      return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+    };
 
-    // Cleanup interval on component unmount
-    return () => clearInterval(interval);
-  }, [provider]);
+    calculateDeliveryTime();
+    const timer = setInterval(calculateDeliveryTime, 60000); // Update every minute
+    return () => clearInterval(timer);
+  }, [provider, tat]);
 
   return (
-    <View style={[styles.container, style]}>
-      {!isExpired && provider !== "General Partners" && (
-        <View style={styles.timerContainer}>
-          <View style={styles.headerContainer}>
-            {/* <Image
-              source={require('../../assets/clock.png')}
-              style={styles.clockIcon}
-            /> */}
-            <Text style={styles.timerText}>Order within</Text>
-          </View>
-          
-          <View style={styles.timeContainer}>
-            <View style={styles.timeBlock}>
-              <Text style={styles.timeValue}>{timeRemaining}</Text>
-            </View>
-          </View>
-          
-          <Text style={styles.deliveryText}>
-            for <Text style={styles.highlightText}>Same Day Delivery</Text>
-          </Text>
-        </View>
-      )}
+    <View style={styles.container}>
+      <Clock size={16} color="#15803d" />
+      <View style={styles.textContainer}>
+        <Text style={styles.text}>
+          {isSameDay ? (
+            <>
+              Order within <Text style={styles.boldText}>{timeLeft.hours} hrs {timeLeft.minutes} mins</Text> to get it by Today
+            </>
+          ) : (
+            <>
+              {provider === "General Partners" || (provider === "Provider A" && !isSameDay) ? (
+                <>
+                  Estimated delivery by{' '}
+                  <Text style={styles.boldText}>
+                    {deliveryInfo.day}, {deliveryInfo.date} ({tat} days)
+                  </Text>
+                </>
+              ) : (
+                <>
+                  Get it by{' '}
+                  <Text style={styles.boldText}>
+                    {deliveryInfo.day === 'Tomorrow' ? 
+                      `Tomorrow, ${deliveryInfo.date}` : 
+                      `${deliveryInfo.day}, ${deliveryInfo.date}`}
+                  </Text>
+                </>
+              )}
+            </>
+          )}
+        </Text>
+      </View>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-    container: {
-      marginVertical: 15,
-      marginHorizontal: 10,
-      borderRadius: 12,
-      backgroundColor: '#FFF0F5', // Light pink background
-      elevation: 2,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.1,
-      shadowRadius: 4,
-      borderWidth: 1,
-      borderColor: '#E2226E', // Main pink color for border
-      borderStyle:"dashed"
-    },
-    timerContainer: {
-      padding: 15,
-      alignItems: 'center',
-    },
-    headerContainer: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: 10,
-    },
-    clockIcon: {
-      width: 20,
-      height: 20,
-      marginRight: 8,
-      tintColor: '#E2226E', // Main pink color for icon
-    },
-    timerText: {
-      fontSize: 16,
-      color: '#424242',
-      fontWeight: '500',
-    },
-    timeContainer: {
-      flexDirection: 'row',
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginVertical: 8,
-    },
-    timeBlock: {
-      backgroundColor: '#E2226E', // Main pink color for time block
-      borderRadius: 8,
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      minWidth: 120,
-      alignItems: 'center',
-      shadowColor: '#E2226E',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.2,
-      shadowRadius: 3,
-      elevation: 3,
-    },
-    timeValue: {
-      fontSize: 24,
-      fontWeight: 'bold',
-      color: '#FFFFFF',
-      letterSpacing: 1,
-    },
-    deliveryText: {
-      fontSize: 14,
-      color: '#616161',
-      marginTop: 8,
-    },
-    highlightText: {
-      color: '#E2226E', // Main pink color for highlighted text
-      fontWeight: '600',
-    },
-  });
+  container: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    alignContent: "flex-start",
+    flex: 1,
+    justifyContent: "flex-start",
+    width: "100%",
+    padding: 16,
+    paddingLeft: 2,
+    paddingTop: 2,
+    borderRadius: 8,
+    gap: 8,
+  },
+  textContainer: {
+    flex: 1,
+  },
+  text: {
+    fontSize: 14,
+    color: '#15803d',
+  },
+  boldText: {
+    fontWeight: '600',
+  },
+});
 
 export default CountdownTimer;
