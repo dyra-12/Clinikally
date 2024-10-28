@@ -167,13 +167,13 @@ const styles = StyleSheet.create({
     height: 20,
   },
   text2: {
-    fontSize: 14,
+    fontSize: 10,
   },
   star: {
     color: "#FFD700",
   },
   icoText: {
-    fontSize: 14,
+    fontSize: 10,
     color: "#333",
   },
 });
