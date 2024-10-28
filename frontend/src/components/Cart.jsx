@@ -1,34 +1,54 @@
-import React from 'react'
+import React from 'react';
 import {
-    View,
-    Text,
-    Image,
-    StyleSheet,
-    TouchableOpacity,
-    TextInput,
-    ScrollView,
-  } from "react-native";
-const Cart = () => {
-  return (
-    <View style={styles.buttonsContainer}>
-         <View style={styles.up}>
-            <View style={styles.uprev}><Text >Reviews</Text></View>    
-            
-            <View style={styles.upnxt}><Text>Get it By</Text></View>
-         </View>
-         <View style={styles.down}>
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
+import Icon from "react-native-vector-icons/MaterialIcons";
 
-         <TouchableOpacity style={styles.cartButton}>
+const Cart = ({ deliveryInfo, onCheckDelivery }) => {
+  // const [showPincodeModal, setShowPincodeModal] = useState(false);
+
+  return (
+    <>
+      <View style={styles.buttonsContainer}>
+        <View style={styles.up}>
+          <View style={styles.uprev}>
+            <Text style={styles.text2}>
+              <Text style={styles.star}>★</Text> 4.8 (30 Reviews)
+            </Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.upnxt}
+            onPress={onCheckDelivery}
+          >
+            <Image source={require("../../assets/download.png")} style={styles.ico} />
+            <Text style={styles.icoText}>
+              {deliveryInfo ? 
+                deliveryInfo.available ? 
+                  `Get it by ${deliveryInfo.message}` : 
+                  deliveryInfo.message 
+                : "Check delivery date"}
+            </Text>
+            <Icon name="chevron-right" size={20} color="#666" />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.down}>
+          <TouchableOpacity style={styles.cartButton}>
             <Text style={styles.cartButtonText}>Add to cart</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.buyButton}>
             <Text style={styles.buyButtonText}>Buy it now</Text>
           </TouchableOpacity>
-         </View>
-          
-    </View>
-  )
-}
+        </View>
+      </View>
+    </>
+  );
+};
+
 
 export default Cart;
 const styles = StyleSheet.create({
@@ -71,7 +91,10 @@ const styles = StyleSheet.create({
         textAlign: "center",
         paddingLeft:20,
         textAlignVertical:"center",
+        flexDirection:"row",
         justifyContent: "center",
+        alignItems:"center",
+        gap:6,
         // borderRightWidth:1,
         borderColor:'#ddd',
         height: "100%",
@@ -98,6 +121,11 @@ const styles = StyleSheet.create({
         padding: 10,
         // marginRight: 8,
         alignItems: "center",
+      },
+      ico:{
+        width:20,
+        height:20,
+
       },
       cartButtonText: {
         color: "#9747FF",

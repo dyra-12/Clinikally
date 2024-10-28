@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   TextInput,
   ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback
 } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import stockData from "../../assets/stock.json";
@@ -15,6 +19,7 @@ import Navbar from "./layout/Navbar";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Cart from "./Cart";
+import CountdownTimer from "./CountdownTimer";
 
 const ProductDetail = () => {
   const route = useRoute();
@@ -24,26 +29,43 @@ const ProductDetail = () => {
   const [selectedPack, setSelectedPack] = useState("30 gm");
   const [quantity, setQuantity] = useState(1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  
+  const [isInStock, setIsInStock] = useState(true);
+  const [showTimer, setShowTimer] = useState(false);
   const [product] = useState({
     ...route.params?.product,
     "Original Price": 1099,
     "Sale Price": 989,
     benefits: ["Reduce Fineline", "Hydrates", "Lightens Skin"],
   });
+  const dismissKeyboard = () => {
+    Keyboard.dismiss();
+  };
 
-  const carouselImages = Array(8).fill(null); // For 8 carousel indicators
+  const carouselImages = Array(8).fill(null);
 
-  const checkDelivery = () => {
-    setLoading(true);
-
-    // Check if product is in stock
+  // Check stock status on component mount
+  useEffect(() => {
     const stockInfo = stockData.find(
       (item) => item["Product ID"] === product["Product ID"]
     );
-    if (!stockInfo?.["Stock Available"]) {
+    console.log("Stock Info:", stockInfo); // Debug log
+    setIsInStock(stockInfo?.["Stock Available"] !== "False");
+  }, [product]);
+
+  const checkDelivery = () => {
+    setLoading(true);
+    setShowTimer(false); // Reset timer visibility
+
+    const stockInfo = stockData.find(
+      (item) => item["Product ID"] === product["Product ID"]
+    );
+    
+    if (stockInfo?.["Stock Available"] === "False") {
       setDeliveryInfo({
         available: false,
-        message: "Product is currently out of stock",
+        message: "Currently out of stock",
+        isOutOfStock: true
       });
       setLoading(false);
       return;
@@ -55,6 +77,7 @@ const ProductDetail = () => {
       setDeliveryInfo({
         available: false,
         message: "Delivery not available at this location",
+        isOutOfStock: false
       });
       setLoading(false);
       return;
@@ -69,51 +92,36 @@ const ProductDetail = () => {
     switch (pincodeInfo["Logistics Provider"]) {
       case "Provider A":
         if (currentHour < 17) {
-          // Before 5 PM
           deliveryDate = new Date();
           message = "Same-day delivery available if ordered before 5 PM";
         } else {
           deliveryDate.setDate(deliveryDate.getDate() + 1);
           message = `Next-day delivery by ${deliveryDate.toLocaleDateString(
             "en-US",
-            {
-              weekday: "long",
-              month: "short",
-              day: "numeric",
-            }
+            { weekday: "long", month: "short", day: "numeric" }
           )}`;
         }
         break;
 
       case "Provider B":
         if (currentHour < 9) {
-          // Before 9 AM
           deliveryDate = new Date();
           message = "Same-day delivery available if ordered now";
         } else {
           deliveryDate.setDate(deliveryDate.getDate() + 1);
           message = `Next-day delivery by ${deliveryDate.toLocaleDateString(
             "en-US",
-            {
-              weekday: "long",
-              month: "short",
-              day: "numeric",
-            }
+            { weekday: "long", month: "short", day: "numeric" }
           )}`;
         }
         break;
 
       case "General Partners":
-        // Using TAT from pincode data for delivery estimate
         const tat = parseInt(pincodeInfo.TAT);
         deliveryDate.setDate(deliveryDate.getDate() + tat);
         message = `Estimated delivery by ${deliveryDate.toLocaleDateString(
           "en-US",
-          {
-            weekday: "long",
-            month: "short",
-            day: "numeric",
-          }
+          { weekday: "long", month: "short", day: "numeric" }
         )} (${tat} days)`;
         break;
 
@@ -130,13 +138,24 @@ const ProductDetail = () => {
       deliveryDate,
     });
 
+    setShowTimer(true); // Show timer when delivery info is available
     setLoading(false);
   };
 
   return (
     <SafeAreaView style={styles.container} edges={["top"]}>
       <Navbar />
-      <ScrollView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardAvoidingContainer}
+        keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
+      >
+        <TouchableWithoutFeedback onPress={dismissKeyboard}>
+          <ScrollView 
+            style={styles.container}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
         <View style={styles.breadcrumb}>
           <Text style={styles.breadcrumbText}>Home / Skin Cream</Text>
         </View>
@@ -170,12 +189,7 @@ const ProductDetail = () => {
           />
           <TouchableOpacity style={styles.magnifyButton}>
             <Text style={styles.magnifyIcon}>
-              <Icon
-                name="search"
-                size={20}
-                color="black"
-                style={styles.searchIcon}
-              />
+              <Icon name="search" size={20} color="black" style={styles.searchIcon} />
             </Text>
           </TouchableOpacity>
 
@@ -220,9 +234,7 @@ const ProductDetail = () => {
           <View style={styles.priceRow}>
             <View style={styles.l}>
               <View style={styles.lBaacha}>
-                <Text style={styles.originalPrice}>
-                  ₹{product["Original Price"]}
-                </Text>
+                <Text style={styles.originalPrice}>₹{product["Original Price"]}</Text>
                 <Text style={styles.salePrice}>₹{product["Sale Price"]}</Text>
                 <View style={styles.saveTag}>
                   <Text style={styles.saveTagText}>SAVE 10%</Text>
@@ -234,165 +246,154 @@ const ProductDetail = () => {
             </View>
 
             <View style={styles.r}>
-              <View style={styles.hurryButton}>
-                <Text style={styles.hurryButtonText}>Hurry, Few Left!</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.packContainer}>
-          <View style={styles.packText}>
-          <Text style={styles.packLabel}>Pack:</Text>
-          </View>
-          
-          <View style={styles.packOptions}>
-            <TouchableOpacity
-              style={[
-                styles.packButton,
-                selectedPack === "30 gm" && styles.selectedPack,
-              ]}
-              onPress={() => setSelectedPack("30 gm")}
-            >
-              <Text
-                style={[
-                  styles.packButtonText,
-                  selectedPack === "30 gm" && styles.selectedPackText,
-                ]}
-              >
-                30 gm
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[
-                styles.packButton,
-                selectedPack === "2 x 30 gm" && styles.selectedPack,
-              ]}
-              onPress={() => setSelectedPack("2 x 30 gm")}
-            >
-              <Text
-                style={[
-                  styles.packButtonText,
-                  selectedPack === "2 x 30 gm" && styles.selectedPackText,
-                ]}
-              >
-                2 x 30 gm
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View style={styles.quantityContainer}>
-          <Text style={styles.quantityLabel}>Qty:</Text>
-          <View style={styles.quantitySelector}>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => setQuantity(Math.max(1, quantity - 1))}
-            >
-              <Text style={styles.quantityButtonText}>-</Text>
-            </TouchableOpacity>
-            <Text style={styles.quantityText}>{quantity}</Text>
-            <TouchableOpacity
-              style={styles.quantityButton}
-              onPress={() => setQuantity(quantity + 1)}
-            >
-              <Text style={styles.quantityButtonText}>+</Text>
-            </TouchableOpacity>
-          </View>
-          <View style={styles.recentlyInCart}>
-          <Image
-              source={require("../../assets/graph.png")}
-              style={styles.featureIcon}
-            />
-            <Text style={styles.recentlyInCartText}>
-            
-              Recently in 1575 carts
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.offers}>
-        <View style={styles.offersContainer}>
-          <Text style={styles.offersTitle}>Available offers</Text>
-          <View style={styles.offerItem}>
-            
-            
-            <View style={styles.offerIconContainer}>
-              
-              <Image
-              source={require("../../assets/checkstar.png")}
-              style={styles.OfferIcon}
-            />
-              
-            </View>
-
-
-            <View style={styles.offerDetails}>
-              <Text style={styles.offerText}>₹10 off on prepaid orders</Text>
-              <Text style={styles.offerSubtext}>Auto applied at checkout.</Text>
-            </View>
-            
-          </View>
-        </View>
-
-        </View>
-
-        <View style={styles.deliveryContainer}>
-          <Text style={styles.deliveryText}> Select Delivery Location </Text>
-          <View style={styles.pincodeInputContainer}>
-            <TextInput
-              style={styles.pincodeInput}
-              placeholder="Enter Pincode"
-              value={pincode}
-              onChangeText={setPincode}
-              keyboardType="numeric"
-              maxLength={6}
-            />
-            <TouchableOpacity
-              style={[
-                styles.checkButton,
-                pincode.length !== 6 && styles.disabledButton,
-              ]}
-              onPress={checkDelivery}
-              disabled={pincode.length !== 6}
-            >
-              <Text style={styles.checkButtonText}>Check</Text>
-            </TouchableOpacity>
-          </View>
-
-          {loading && (
-            <Text style={styles.loadingText}>
-              Checking delivery information...
-            </Text>
-          )}
-
-          {deliveryInfo && (
-            <View style={styles.deliveryInfo}>
-              <Text
-                style={[
-                  styles.deliveryMessage,
-                  !deliveryInfo.available && styles.errorMessage,
-                ]}
-              >
-                {deliveryInfo.message}
-              </Text>
-              {deliveryInfo.available && (
-                <Text style={styles.providerInfo}>
-                  Delivery by: {deliveryInfo.provider}
-                </Text>
+              {!isInStock ? (
+                <View style={[styles.hurryButton, { backgroundColor: '#ff4444' }]}>
+                  <Text style={styles.hurryButtonText}>Out of Stock</Text>
+                </View>
+              ) : (
+                <View style={styles.hurryButton}>
+                  <Text style={styles.hurryButtonText}>Hurry, Few Left!</Text>
+                </View>
               )}
             </View>
-          )}
+          </View>
         </View>
 
+        {/* Conditional rendering of sections based on stock status */}
+        {isInStock && (
+          <>
+            <View style={styles.packContainer}>
+              <View style={styles.packText}>
+                <Text style={styles.packLabel}>Pack:</Text>
+              </View>
+              <View style={styles.packOptions}>
+                <TouchableOpacity
+                  style={[styles.packButton, selectedPack === "30 gm" && styles.selectedPack]}
+                  onPress={() => setSelectedPack("30 gm")}
+                >
+                  <Text style={[styles.packButtonText, selectedPack === "30 gm" && styles.selectedPackText]}>
+                    30 gm
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.packButton, selectedPack === "2 x 30 gm" && styles.selectedPack]}
+                  onPress={() => setSelectedPack("2 x 30 gm")}
+                >
+                  <Text style={[styles.packButtonText, selectedPack === "2 x 30 gm" && styles.selectedPackText]}>
+                    2 x 30 gm
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.quantityContainer}>
+              <Text style={styles.quantityLabel}>Qty:</Text>
+              <View style={styles.quantitySelector}>
+                <TouchableOpacity
+                  style={styles.quantityButton}
+                  onPress={() => setQuantity(Math.max(1, quantity - 1))}
+                >
+                  <Text style={styles.quantityButtonText}>-</Text>
+                </TouchableOpacity>
+                <Text style={styles.quantityText}>{quantity}</Text>
+                <TouchableOpacity
+                  style={styles.quantityButton}
+                  onPress={() => setQuantity(quantity + 1)}
+                >
+                  <Text style={styles.quantityButtonText}>+</Text>
+                </TouchableOpacity>
+              </View>
+              <View style={styles.recentlyInCart}>
+                <Image
+                  source={require("../../assets/graph.png")}
+                  style={styles.featureIcon}
+                />
+                <Text style={styles.recentlyInCartText}>Recently in 1575 carts</Text>
+              </View>
+            </View>
+
+            <View style={styles.offers}>
+              <View style={styles.offersContainer}>
+                <Text style={styles.offersTitle}>Available offers</Text>
+                <View style={styles.offerItem}>
+                  <View style={styles.offerIconContainer}>
+                    <Image
+                      source={require("../../assets/checkstar.png")}
+                      style={styles.OfferIcon}
+                    />
+                  </View>
+                  <View style={styles.offerDetails}>
+                    <Text style={styles.offerText}>₹10 off on prepaid orders</Text>
+                    <Text style={styles.offerSubtext}>Auto applied at checkout.</Text>
+                  </View>
+                </View>
+              </View>
+            </View>
+
+            
+
+            {/* <CountdownTimer provider={deliveryInfo.provider}/> */}
+            {showTimer && deliveryInfo?.available && (
+          <CountdownTimer provider={deliveryInfo.provider} />
+        )}
+
+            <View style={styles.deliveryContainer}>
+        <Text style={styles.deliveryText}>Select Delivery Location</Text>
+        <View style={styles.pincodeInputContainer}>
+          <TextInput
+            style={styles.pincodeInput}
+            placeholder="Enter Pincode"
+            value={pincode}
+            onChangeText={setPincode}
+            keyboardType="numeric"
+            maxLength={6}
+          />
+          <TouchableOpacity
+            style={[styles.checkButton, pincode.length !== 6 && styles.disabledButton]}
+            onPress={checkDelivery}
+            disabled={pincode.length !== 6}
+          >
+            <Text style={styles.checkButtonText}>Check</Text>
+          </TouchableOpacity>
+        </View>
+
+        {loading && (
+          <Text style={styles.loadingText}>Checking delivery information...</Text>
+        )}
+
+        {deliveryInfo && (
+          <View style={styles.deliveryInfo}>
+            <Text style={[styles.deliveryMessage, !deliveryInfo.available && styles.errorMessage]}>
+              {deliveryInfo.message}
+            </Text>
+            {deliveryInfo.available && (
+              <Text style={styles.providerInfo}>Delivery by: {deliveryInfo.provider}</Text>
+            )}
+          </View>
+        )}
+
         
-      </ScrollView>
-      <Cart />
+      </View>
+          </>
+        
+        )}
+       <View style={styles.keyboardSpacing} />
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+
+      {isInStock && (
+        <>
+        <Cart />
+        </>
+      )}
+      
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  
   container: {
     flex: 1,
     backgroundColor: "#f4f5f7",
@@ -809,6 +810,31 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 13,
     fontWeight: "500",
+  },
+  keyboardAvoidingContainer: {
+    flex: 1,
+  },
+  keyboardSpacing: {
+    height: Platform.OS === 'ios' ? 150 : 80, // Extra padding at bottom for keyboard
+  },
+  pincodeInputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 16,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 0, // Extra padding for iOS
+  },
+  pincodeInput: {
+    flex: 1,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderRadius: 8,
+    padding: 12,
+    marginRight: 8,
+    backgroundColor: '#fff', // Adding background color for better visibility
+  },
+  deliveryContainer: {
+    padding: 16,
+    paddingBottom: Platform.OS === 'ios' ? 32 : 16, // Extra padding for iOS
   },
 });
 
