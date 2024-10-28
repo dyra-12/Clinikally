@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ProductCarousel from './ProductCarousel';
 import {
   View,
   Text,
@@ -177,34 +178,8 @@ const ProductDetail = () => {
           ))}
         </View>
 
-        <View style={styles.imageContainer}>
-          <Image
-            source={require("../../assets/doctorIcon.png")}
-            style={styles.cornerImage}
-          />
-          <Image
-            source={require("../../assets/p5.png")}
-            style={styles.productImage}
-          />
-          <TouchableOpacity style={styles.magnifyButton}>
-            <Text style={styles.magnifyIcon}>
-              <Icon name="search" size={20} color="black" style={styles.searchIcon} />
-            </Text>
-          </TouchableOpacity>
-
-          <View style={styles.carouselIndicators}>
-            {carouselImages.map((_, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.indicator,
-                  currentImageIndex === index && styles.activeIndicator,
-                ]}
-              />
-            ))}
-          </View>
-        </View>
-
+        <ProductCarousel />
+         
         <View style={styles.featuresContainer}>
           <View style={styles.featureItem}>
             <Image
