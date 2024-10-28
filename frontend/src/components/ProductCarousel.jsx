@@ -122,10 +122,11 @@ const styles = StyleSheet.create({
   container: {
     position: 'relative',
     width: width,
-    height: 320, // Fixed height instead of relative
+    height: 360,
     backgroundColor: '#f4f5f7',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
+    // backgroundColor:"pink"
   },
   scrollView: {
     width: width,
@@ -140,42 +141,55 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 10,
     left: 30,
-    top: 20,
+    top: 30,
   },
   imageContainer: {
     width: width,
     height: '100%',
-    justifyContent: 'center',
+    // backgroundColor:"yellow",
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    paddingHorizontal: 20, // Add some padding to prevent image from touching edges
+    paddingHorizontal: 20,
   },
   productImage: {
     width: '100%',
-    height: '85%', // Reduced slightly to prevent cropping
+    height: '85%',
     borderRadius: 20,
   },
   cara: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 15, // Changed from 20 to 10 to move buttons lower
     flexDirection: 'row',
-    width: '95%',
+    width: '100%', // Changed from 95% to 100% for better alignment
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingHorizontal: 15, // Added padding instead of width reduction
   },
   navButton: {
     borderRadius: 100,
     padding: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Slightly more opaque
     width: 40,
     height: 40,
+    elevation: 2, // Added elevation for Android
+    shadowColor: '#000', // Added shadow for iOS
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
   },
-  prevButton: {},
-  nextButton: {},
+  prevButton: {
+    marginLeft: 5, // Added margin for better positioning
+  },
+  nextButton: {
+    marginRight: 5, // Added margin for better positioning
+  },
   pagination: {
     flexDirection: 'row',
-    width: '40%',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -191,12 +205,21 @@ const styles = StyleSheet.create({
   },
   magnifyButton: {
     position: 'absolute',
-    right: 16,
-    bottom: 70,
+    right: 30,
+    top:30, // Changed from 70 to 60 to maintain spacing with new button position
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 8,
     zIndex: 10,
+    elevation: 2, // Added elevation for Android
+    shadowColor: '#000', // Added shadow for iOS
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
   },
 });
+
 export default ProductCarousel;

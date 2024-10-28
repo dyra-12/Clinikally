@@ -389,6 +389,7 @@ const styles = StyleSheet.create({
   benefitsContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
+    width: "100%",
     // padding: 16,
     paddingLeft: 12,
     paddingBottom: 10,
@@ -410,7 +411,7 @@ const styles = StyleSheet.create({
   },
   benefitText: {
     color: "#008001",
-    fontSize: 14,
+    fontSize: 11,
     flexShrink: 1, // Prevents the text from wrapping to the next line
   },
   searchIcon: {
