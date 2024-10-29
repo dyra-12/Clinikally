@@ -89,10 +89,10 @@
     <th>Countdown Timer</th>
   </tr>
   <tr>
-    <td><img src="./frontend/assets/s1.jpeg" alt="Screenshot 1" width="300px"></td>
-    <td><img src="./frontend/assets/s2.jpeg" alt="Screenshot 2" width="300px"></td>
-    <td><img src="./frontend/assets/s3.jpeg" alt="Screenshot 3" width="300px"></td>
-    <td><img src="./frontend/assets/s4.jpeg" alt="Screenshot 4" width="300px"></td>
+    <td><img src="./frontend/assets/ss1.jpeg" alt="Screenshot 1" width="300px"></td>
+    <td><img src="./frontend/assets/ss2.jpeg" alt="Screenshot 2" width="300px"></td>
+    <td><img src="./frontend/assets/ss3.jpeg" alt="Screenshot 3" width="300px"></td>
+    <td><img src="./frontend/assets/ss4.jpeg" alt="Screenshot 4" width="300px"></td>
   </tr>
 </table>
 
