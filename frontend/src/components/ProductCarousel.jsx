@@ -10,10 +10,13 @@ const ProductCarousel = () => {
   const slideRef = useRef(null);
 
   const productImages = [
-    require("../../assets/p5.png"),
-    require("../../assets/pd1.jpg"),
-    require("../../assets/pd2.jpg"),
-    require("../../assets/pd3.jpg"),
+    // require("../../assets/p5.png"),
+    require("../../assets/pv1.jpg"),
+    require("../../assets/pv2.jpg"),
+    require("../../assets/pv3.jpg"),
+    require("../../assets/pv4.jpg"),
+    require("../../assets/pv5.jpg"),
+    require("../../assets/pv6.jpg"),
     require("../../assets/pd4.png")
     
   ];

@@ -7,11 +7,18 @@ import {
   TouchableOpacity,
 } from "react-native";
 import Icon from "react-native-vector-icons/MaterialIcons";
+import moment from 'moment';
 
 const Cart = ({ deliveryInfo }) => {
   const getDeliveryText = () => {
     if (!deliveryInfo) {
-      return "Check delivery date";
+      // Get current date and add 5 days
+      const deliveryDate = moment().add(5, 'days');
+      
+      // Format the date
+      const formattedDate = deliveryDate.format('MMM D');
+      
+      return `Get it By ${formattedDate}`;
     }
 
     if (!deliveryInfo.available) {
@@ -20,12 +27,7 @@ const Cart = ({ deliveryInfo }) => {
 
     // Format the delivery date
     if (deliveryInfo.deliveryDate) {
-      const date = new Date(deliveryInfo.deliveryDate);
-      const formattedDate = date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        month: 'short',
-        day: 'numeric'
-      });
+      const formattedDate = moment(deliveryInfo.deliveryDate).format('dddd, MMM D');
       return `Get it by ${formattedDate}`;
     }
 
@@ -37,7 +39,7 @@ const Cart = ({ deliveryInfo }) => {
       <View style={styles.up}>
         <View style={styles.uprev}>
           <Text style={styles.text2}>
-            <Text style={styles.star}>★</Text> 4.8 (30 Reviews)
+            <Text style={styles.star}>★</Text> 4.6 (125 Reviews)
           </Text>
         </View>
         <TouchableOpacity style={styles.upnxt}>
@@ -46,7 +48,7 @@ const Cart = ({ deliveryInfo }) => {
             style={styles.ico}
           />
           <Text style={styles.icoText}>{getDeliveryText()}</Text>
-          <Icon name="chevron-right" size={20} color="#666" />
+          {/* <Icon name="chevron-right" size={20} color="#666" /> */}
         </TouchableOpacity>
       </View>
 
@@ -167,13 +169,13 @@ const styles = StyleSheet.create({
     height: 20,
   },
   text2: {
-    fontSize: 10,
+    fontSize: 12.5,
   },
   star: {
     color: "#FFD700",
   },
   icoText: {
-    fontSize: 10,
+    fontSize: 12.5,
     color: "#333",
   },
 });

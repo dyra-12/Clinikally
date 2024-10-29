@@ -87,12 +87,12 @@ const ProductList = () => {
       >
         <View style={styles.imageContainer}>
           <Image
-            source={require('../../assets/p5.png')}
-            defaultSource={require('../../assets/p5.png')}
+            source={require('../../assets/pv1.jpg')}
+            defaultSource={require('../../assets/pv1.jpg')}
             style={styles.productImage}
           />
           <View style={styles.saveTag}>
-            <Text style={styles.saveText}>SAVE 15%</Text>
+            <Text style={styles.saveText}>SAVE 10%</Text>
           </View>
         </View>
         <View style={styles.productInfo}>

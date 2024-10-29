@@ -16,6 +16,7 @@ import {
 import { useRoute } from "@react-navigation/native";
 import stockData from "../../assets/stock.json";
 import pincodeData from "../../assets/pincodes.json";
+import productsData from "../../assets/products.json"; 
 import Navbar from "./layout/Navbar";
 import Icon from "react-native-vector-icons/MaterialIcons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -34,12 +35,24 @@ const ProductDetail = () => {
   
   const [isInStock, setIsInStock] = useState(true);
   const [showTimer, setShowTimer] = useState(false);
-  const [product] = useState({
-    ...route.params?.product,
-    "Original Price": 1099,
-    "Sale Price": 989,
-    benefits: ["Reduce Fineline", "Hydrates", "Lightens Skin"],
+
+
+  const [product] = useState(() => {
+    const baseProduct = route.params?.product;
+    const productInfo = productsData.find(p => p["Product ID"] === baseProduct["Product ID"]);
+    
+    const salePrice = productInfo?.Price || baseProduct["Sale Price"] || 989; // Fallback if Price not found
+    const originalPrice = (salePrice * 1.2).toFixed(2); // Calculate original price as 125% of sale price
+    
+    return {
+      ...baseProduct,
+      "Sale Price": salePrice,
+      "Original Price": originalPrice,
+      benefits: ["Reduce Fineline", "Hydrates", "Lightens Skin"],
+    };
   });
+
+
   const dismissKeyboard = () => {
     Keyboard.dismiss();
   };
