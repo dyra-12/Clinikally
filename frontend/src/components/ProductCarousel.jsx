@@ -4,18 +4,23 @@ import { MaterialIcons } from '@expo/vector-icons';
 
 const { width } = Dimensions.get('window');
 
-const ProductCarousel = ({ images = [], onImagePress }) => {
+const ProductCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollX = useRef(new Animated.Value(0)).current;
   const slideRef = useRef(null);
 
-  // If no images provided, use a default product image
-  const defaultImage = require("../../assets/p5.png");
-  const displayImages = images.length > 0 ? images : Array(8).fill(defaultImage);
+  const productImages = [
+    require("../../assets/p5.png"),
+    require("../../assets/pd1.jpg"),
+    require("../../assets/pd2.jpg"),
+    require("../../assets/pd3.jpg"),
+    require("../../assets/pd4.png")
+    
+  ];
 
   useEffect(() => {
     const timer = setInterval(() => {
-      if (activeIndex === displayImages.length - 1) {
+      if (activeIndex === productImages.length - 1) {
         setActiveIndex(0);
         slideRef.current.scrollTo({ x: 0, animated: true });
       } else {
@@ -33,13 +38,13 @@ const ProductCarousel = ({ images = [], onImagePress }) => {
   );
 
   const handlePrevious = () => {
-    const newIndex = activeIndex === 0 ? displayImages.length - 1 : activeIndex - 1;
+    const newIndex = activeIndex === 0 ? productImages.length - 1 : activeIndex - 1;
     setActiveIndex(newIndex);
     slideRef.current.scrollTo({ x: width * newIndex, animated: true });
   };
 
   const handleNext = () => {
-    const newIndex = activeIndex === displayImages.length - 1 ? 0 : activeIndex + 1;
+    const newIndex = activeIndex === productImages.length - 1 ? 0 : activeIndex + 1;
     setActiveIndex(newIndex);
     slideRef.current.scrollTo({ x: width * newIndex, animated: true });
   };
@@ -48,6 +53,10 @@ const ProductCarousel = ({ images = [], onImagePress }) => {
     const contentOffset = event.nativeEvent.contentOffset.x;
     const index = Math.round(contentOffset / width);
     setActiveIndex(index);
+  };
+
+  const handleImagePress = (index) => {
+    console.log('Image pressed:', index);
   };
 
   return (
@@ -66,13 +75,12 @@ const ProductCarousel = ({ images = [], onImagePress }) => {
         onMomentumScrollEnd={handleMomentumScrollEnd}
         scrollEventThrottle={16}
         style={styles.scrollView}
-        contentContainerStyle={styles.scrollViewContent}
       >
-        {displayImages.map((image, index) => (
+        {productImages.map((image, index) => (
           <TouchableOpacity 
-            key={index}
-            onPress={() => onImagePress?.(index)}
+            key={index} 
             style={styles.imageContainer}
+            onPress={() => handleImagePress(index)}
           >
             <Image
               source={image}
@@ -83,7 +91,7 @@ const ProductCarousel = ({ images = [], onImagePress }) => {
         ))}
       </Animated.ScrollView>
 
-      <View style={styles.cara}>
+      <View style={styles.controls}>
         <TouchableOpacity
           style={[styles.navButton, styles.prevButton]}
           onPress={handlePrevious}
@@ -92,7 +100,7 @@ const ProductCarousel = ({ images = [], onImagePress }) => {
         </TouchableOpacity>
 
         <View style={styles.pagination}>
-          {displayImages.map((_, index) => (
+          {productImages.map((_, index) => (
             <View
               key={index}
               style={[
@@ -121,18 +129,10 @@ const ProductCarousel = ({ images = [], onImagePress }) => {
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    width: width,
-    height: 330,
+    width: '100%',
+    height: 320,
     backgroundColor: '#f4f5f7',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    // backgroundColor:"pink"
-  },
-  scrollView: {
-    width: width,
-    height: '100%',
-  },
-  scrollViewContent: {
+    justifyContent: 'center',
     alignItems: 'center',
   },
   cornerImage: {
@@ -141,52 +141,45 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 10,
     left: 30,
-    top: 15,
+    top: 20,
+  },
+  scrollView: {
+    width: width,
   },
   imageContainer: {
-    width: width,
+    width: width, // Changed to full width
     height: '100%',
-    // backgroundColor:"yellow",
-    justifyContent: 'flex-start',
+    justifyContent: 'center',
     alignItems: 'center',
-    paddingHorizontal: 20,
   },
   productImage: {
-    width: '100%',
-    height: '85%',
+    width: width * 0.9, // Keep image slightly smaller than screen width
+    height: '90%',
     borderRadius: 20,
   },
-  cara: {
+  controls: {
     position: 'absolute',
-    bottom: 10, // Changed from 20 to 10 to move buttons lower
+    bottom: 20,
     flexDirection: 'row',
-    width: '100%', // Changed from 95% to 100% for better alignment
+    width: '95%',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 15, // Added padding instead of width reduction
+    zIndex: 10,
   },
   navButton: {
     borderRadius: 100,
     padding: 4,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.9)', // Slightly more opaque
-    width: 40,
-    height: 40,
-    elevation: 2, // Added elevation for Android
-    shadowColor: '#000', // Added shadow for iOS
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
   },
   prevButton: {
-    marginLeft: 5, // Added margin for better positioning
+    width: 40,
+    height: 40,
   },
   nextButton: {
-    marginRight: 5, // Added margin for better positioning
+    width: 40,
+    height: 40,
   },
   pagination: {
     flexDirection: 'row',
@@ -206,19 +199,13 @@ const styles = StyleSheet.create({
   magnifyButton: {
     position: 'absolute',
     right: 30,
-    top:15, // Changed from 70 to 60 to maintain spacing with new button position
+    bottom: 260,
     backgroundColor: 'white',
     borderRadius: 20,
     padding: 8,
     zIndex: 10,
-    elevation: 2, // Added elevation for Android
-    shadowColor: '#000', // Added shadow for iOS
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.15,
-    shadowRadius: 3.84,
+    borderWidth:0.6,
+    borderColor:"#CACCCE"
   },
 });
 
