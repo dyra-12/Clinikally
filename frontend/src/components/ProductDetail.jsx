@@ -35,12 +35,12 @@ const ProductDetail = () => {
   
   const [isInStock, setIsInStock] = useState(true);
   const [showTimer, setShowTimer] = useState(false);
-
+  const [isValidPincode, setIsValidPincode] = useState(true);
 
   const baseProduct = route.params?.product;
   const productInfo = productsData.find(p => p["Product ID"] === baseProduct["Product ID"]);
   const baseSalePrice = productInfo?.Price || baseProduct["Sale Price"] || 989;
-  const baseOriginalPrice = Math.round(baseSalePrice * 1.25);
+  const baseOriginalPrice = (baseSalePrice * 1.2).toFixed(2);
   
   // State for dynamic prices
   const [currentPrices, setCurrentPrices] = useState({
@@ -83,6 +83,7 @@ const ProductDetail = () => {
   const checkDelivery = () => {
     setLoading(true);
     setShowTimer(false); // Reset timer visibility
+    setIsValidPincode(true); // Reset pincode validity
 
     const stockInfo = stockData.find(
       (item) => item["Product ID"] === product["Product ID"]
@@ -106,6 +107,7 @@ const ProductDetail = () => {
         message: "Delivery not available at this location",
         isOutOfStock: false
       });
+      setIsValidPincode(false);
       setLoading(false);
       return;
     }
@@ -181,6 +183,7 @@ const ProductDetail = () => {
             keyboardShouldPersistTaps="handled"
             showsVerticalScrollIndicator={false}
           >
+
         <View style={styles.breadcrumb}>
           <Text style={styles.breadcrumbText}>Home / Skin Cream</Text>
         </View>
@@ -335,7 +338,7 @@ const ProductDetail = () => {
         <Text style={styles.deliveryText}>Select Delivery Location</Text>
         <View style={styles.pincodeInputContainer}>
           <TextInput
-            style={styles.pincodeInput}
+            style={[styles.pincodeInput, !isValidPincode && styles.invalidPincode]}
             placeholder="Enter Pincode"
             value={pincode}
             onChangeText={setPincode}
@@ -350,6 +353,9 @@ const ProductDetail = () => {
             <Text style={styles.checkButtonText}>Check</Text>
           </TouchableOpacity>
         </View>
+        {!isValidPincode && (
+          <Text style={styles.errorMessage}>Please enter a valid pincode.</Text>
+        )}
         {showTimer && deliveryInfo?.available && (
   <CountdownTimer 
     provider={deliveryInfo.provider} 
@@ -391,6 +397,14 @@ const ProductDetail = () => {
 };
 
 const styles = StyleSheet.create({
+  invalidPincode: {
+    borderColor: '#f44336',
+    color: '#f44336',
+  },
+  errorMessage: {
+    color: '#f44336',
+    marginTop: 8,
+  },
   
   container: {
     flex: 1,
