@@ -37,20 +37,32 @@ const ProductDetail = () => {
   const [showTimer, setShowTimer] = useState(false);
 
 
-  const [product] = useState(() => {
-    const baseProduct = route.params?.product;
-    const productInfo = productsData.find(p => p["Product ID"] === baseProduct["Product ID"]);
-    
-    const salePrice = productInfo?.Price || baseProduct["Sale Price"] || 989; // Fallback if Price not found
-    const originalPrice = (salePrice * 1.2).toFixed(2); // Calculate original price as 125% of sale price
-    
-    return {
-      ...baseProduct,
-      "Sale Price": salePrice,
-      "Original Price": originalPrice,
-      benefits: ["Reduce Fineline", "Hydrates", "Lightens Skin"],
-    };
+  const baseProduct = route.params?.product;
+  const productInfo = productsData.find(p => p["Product ID"] === baseProduct["Product ID"]);
+  const baseSalePrice = productInfo?.Price || baseProduct["Sale Price"] || 989;
+  const baseOriginalPrice = Math.round(baseSalePrice * 1.25);
+  
+  // State for dynamic prices
+  const [currentPrices, setCurrentPrices] = useState({
+    salePrice: baseSalePrice,
+    originalPrice: baseOriginalPrice
   });
+
+  // Initialize product with base data
+  const [product] = useState({
+    ...baseProduct,
+    benefits: ["Reduce Fineline", "Hydrates", "Lightens Skin"],
+  });
+
+  // Update prices when pack size changes
+  const handlePackChange = (packSize) => {
+    const multiplier = packSize === "2 x 30 gm" ? 2 : 1;
+    setCurrentPrices({
+      salePrice: baseSalePrice * multiplier,
+      originalPrice: baseOriginalPrice * multiplier
+    });
+    setSelectedPack(packSize);
+  };
 
 
   const dismissKeyboard = () => {
@@ -218,58 +230,57 @@ const ProductDetail = () => {
         </View>
 
         <View style={styles.priceContainer}>
-          <View style={styles.priceRow}>
-            <View style={styles.l}>
-              <View style={styles.lBaacha}>
-                <Text style={styles.originalPrice}>₹{product["Original Price"]}</Text>
-                <Text style={styles.salePrice}>₹{product["Sale Price"]}</Text>
-                <View style={styles.saveTag}>
-                  <Text style={styles.saveTagText}>SAVE 10%</Text>
+            <View style={styles.priceRow}>
+              <View style={styles.l}>
+                <View style={styles.lBaacha}>
+                  <Text style={styles.originalPrice}>₹{currentPrices.originalPrice}</Text>
+                  <Text style={styles.salePrice}>₹{currentPrices.salePrice}</Text>
+                  <View style={styles.saveTag}>
+                    <Text style={styles.saveTagText}>SAVE 10%</Text>
+                  </View>
+                </View>
+                <View style={styles.tax}>
+                  <Text style={styles.taxInfo}>(incl. of all taxes)</Text>
                 </View>
               </View>
-              <View style={styles.tax}>
-                <Text style={styles.taxInfo}>(incl. of all taxes)</Text>
+
+              <View style={styles.r}>
+                {!isInStock ? (
+                  <View style={[styles.hurryButton, { backgroundColor: '#ff4444' }]}>
+                    <Text style={styles.hurryButtonText}>Out of Stock</Text>
+                  </View>
+                ) : (
+                  <FlashingButton text="Hurry, Few Left!" />
+                )}
               </View>
             </View>
-
-            <View style={styles.r}>
-  {!isInStock ? (
-    <View style={[styles.hurryButton, { backgroundColor: '#ff4444' }]}>
-      <Text style={styles.hurryButtonText}>Out of Stock</Text>
-    </View>
-  ) : (
-    <FlashingButton text="Hurry, Few Left!" />
-  )}
-</View>
           </View>
-        </View>
 
-        {/* Conditional rendering of sections based on stock status */}
-        {isInStock && (
-          <>
-            <View style={styles.packContainer}>
-              <View style={styles.packText}>
-                <Text style={styles.packLabel}>Pack:</Text>
+          {isInStock && (
+            <>
+              <View style={styles.packContainer}>
+                <View style={styles.packText}>
+                  <Text style={styles.packLabel}>Pack:</Text>
+                </View>
+                <View style={styles.packOptions}>
+                  <TouchableOpacity
+                    style={[styles.packButton, selectedPack === "30 gm" && styles.selectedPack]}
+                    onPress={() => handlePackChange("30 gm")}
+                  >
+                    <Text style={[styles.packButtonText, selectedPack === "30 gm" && styles.selectedPackText]}>
+                      30 gm
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.packButton, selectedPack === "2 x 30 gm" && styles.selectedPack]}
+                    onPress={() => handlePackChange("2 x 30 gm")}
+                  >
+                    <Text style={[styles.packButtonText, selectedPack === "2 x 30 gm" && styles.selectedPackText]}>
+                      2 x 30 gm
+                    </Text>
+                  </TouchableOpacity>
+                </View>
               </View>
-              <View style={styles.packOptions}>
-                <TouchableOpacity
-                  style={[styles.packButton, selectedPack === "30 gm" && styles.selectedPack]}
-                  onPress={() => setSelectedPack("30 gm")}
-                >
-                  <Text style={[styles.packButtonText, selectedPack === "30 gm" && styles.selectedPackText]}>
-                    30 gm
-                  </Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.packButton, selectedPack === "2 x 30 gm" && styles.selectedPack]}
-                  onPress={() => setSelectedPack("2 x 30 gm")}
-                >
-                  <Text style={[styles.packButtonText, selectedPack === "2 x 30 gm" && styles.selectedPackText]}>
-                    2 x 30 gm
-                  </Text>
-                </TouchableOpacity>
-              </View>
-            </View>
 
             <View style={styles.quantityContainer}>
               <Text style={styles.quantityLabel}>Qty:</Text>
