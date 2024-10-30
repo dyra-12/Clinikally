@@ -89,10 +89,10 @@
     <th>Countdown Timer</th>
   </tr>
   <tr>
-    <td><img src="./frontend/assets/ss1.jpeg" alt="Screenshot 1" width="300px"></td>
-    <td><img src="./frontend/assets/ss2.jpeg" alt="Screenshot 2" width="300px"></td>
-    <td><img src="./frontend/assets/ss3.jpeg" alt="Screenshot 3" width="300px"></td>
-    <td><img src="./frontend/assets/ss4.jpeg" alt="Screenshot 4" width="300px"></td>
+    <td><img src="./frontend/assets/ss1.png" alt="Screenshot 1" width="300px"></td>
+    <td><img src="./frontend/assets/ss2.png" alt="Screenshot 2" width="300px"></td>
+    <td><img src="./frontend/assets/ss3.png" alt="Screenshot 3" width="300px"></td>
+    <td><img src="./frontend/assets/ss4.png" alt="Screenshot 4" width="300px"></td>
   </tr>
 </table>
 
@@ -100,14 +100,17 @@
 
 <h2 id="live-access">🌐 <strong>Live Access</strong></h2>
 
-<p>The application is hosted and ready to be explored. Access <strong>Clinikally</strong> using the link below or by scanning the QR code for quick access:</p>
+<p>The application is hosted and ready to be explored. Access <strong>Clinikally</strong> using the link below or by scanning the QR code for quick access on Expo Go App:</p>
 
 <ul>
-  <li><strong>App URL</strong>: <a href="https://your-app-hosting-url.com">https://your-app-hosting-url.com</a></li>
+  <li><strong>App URL</strong>: <a href="https://expo.dev/preview/update?message=new%20changes&updateRuntimeVersion=1.0.0&createdAt=2024-10-29T18%3A54%3A24.875Z&slug=exp&projectId=8db3113d-b2a5-4be8-a813-5edbade6f454&group=7154546b-2448-49ea-aa46-3f81ec1da063">Click on this link..</a></li>
 </ul>
 
+<br>
+
+<p>Or scan below the QR Code</p>
 <p align="center">
-  <img src="qr-code.png" alt="QR Code for Clinikally App" width="150px">
+  <img src="./frontend/assets/qr.png" alt="QR Code for Clinikally App" width="250px">
 </p>
 
 <hr>
